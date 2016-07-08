@@ -1,8 +1,6 @@
 #include <iostream>
-#include <string>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
 #include <ctime>
 #include <cstdlib>
 
@@ -18,6 +16,16 @@ void loadMedia(){
 
   SDL_FreeSurface( loadedSurface );
   loadedSurface = NULL;
+}
+
+void freeMem(){
+  std::cout << "Exiting!\n";
+  SDL_DestroyTexture( gBall );
+  gBall = NULL;
+  SDL_DestroyRenderer( gRenderer );
+  gRenderer = NULL;
+  SDL_DestroyWindow( gWindow );
+  gWindow = NULL;
 }
 
 int main(int argc, char* argv[]){
@@ -47,6 +55,9 @@ int main(int argc, char* argv[]){
     if( SDL_PollEvent( &e ) ){
       if( e.type == SDL_QUIT )
         quit = true;
+      else if( e.type == SDL_KEYDOWN )
+        if( e.key.keysym.sym == SDLK_ESCAPE )
+          quit = true;
     }
 
     const Uint8* keystate = SDL_GetKeyboardState(NULL);
@@ -120,11 +131,13 @@ int main(int argc, char* argv[]){
 
     //std::cout << "BallPos X: " << ballXPos << " Y: " << ballYPos << std::endl;
     SDL_Rect rectBall = {ballXPos, ballYPos, ballSize, ballSize};
-    SDL_RenderCopy( gRenderer, gBall, NULL, &rectBall);
+    SDL_RenderCopy( gRenderer, gBall, NULL, &rectBall );
 
     SDL_Rect gRect = {0, height, xlength, ylength};
     SDL_SetRenderDrawColor( gRenderer, 0xFF, 0, 0, 0xFF );
     SDL_RenderFillRect( gRenderer, &gRect );
     SDL_RenderPresent( gRenderer );
   }
+  freeMem();
+  return 0;
 }
